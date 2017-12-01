@@ -1,5 +1,5 @@
 auth:
     base_url: 'https://sso.online.edu.ru/'
-    client_id: 'universarium'
-    client_secret: '8ec3a771-fec3-44f9-b54b-300bf7b0db58'
-    realm: 'portfolio'
+    client_id: your_client_id
+    client_secret: your_client_secret
+    realm: your_realm
