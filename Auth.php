@@ -1,12 +1,15 @@
 <?php
-namespace Universarium\OpenWindow;
-require __DIR__ . '/vendor/autoload.php';
+namespace Coursarium\OpenWindow;
+require __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+
+use Symfony\Component\Yaml\Yaml;
+
 /**
  * Интеграция с "открытым окном".
  * 
  * Пока что реализует лишь пункт "1.1. Взаимодействие с Подсистемой аутентификации Портала".
  */
-class OpenWindow {
+class Auth {
     /**
      * @var string Хранит URL портала (на случай если он изменится)
      */
@@ -38,27 +41,25 @@ class OpenWindow {
     /**
      * @param string $username Имя пользователя, используемое для входа.
      * @param string $password Пароль.
-     * @param array $config Конфигурация, в частности, URL-ы используемые классом.
-     * @return OpenWindow Объект, позволяющий в дальнейшем взаимодействовать с "открытым окном".
+     * @return Auth Объект, позволяющий в дальнейшем взаимодействовать с "открытым окном".
      */
-    function __construct(
+    public function __construct(
         $username,
-        $password,
-        $config = [
-            'baseURL' => 'https://sso.online.edu.ru/',
-            'realm' => 'portfolio'
-        ]
+        $password
     ){
-        $this->baseURL = $config['baseURL'];
-        $this->realm = $config['realm'];
+        $config = Yaml::parse(file_get_contents('config.yml'));
+        $configAuth = $config['auth'];
+        $this->baseURL = $configAuth['base_url'];
+        $this->realm = $configAuth['realm'];
+
         $guzzle = new \GuzzleHttp\Client(['base_uri' => $this->baseURL]);
         $this->endpoints = json_decode($guzzle->get(sprintf("/realms/%s/.well-known/openid-configuration", $this->realm))->getBody());
         $t = microtime(true);
         $loginData = json_decode($guzzle->post($this->endpoints->token_endpoint, [
             'form_params' => [
                 'grant_type' => 'password',
-                'client_id' => 'universarium',
-                'client_secret' => '8ec3a771-fec3-44f9-b54b-300bf7b0db58',
+                'client_id' => $configAuth['client_id'],
+                'client_secret' => $configAuth['client_secret'],
                 'username' => $username,
                 'password' => $password
             ]
