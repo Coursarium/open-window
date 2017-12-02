@@ -44,8 +44,8 @@ class Auth {
      * @return Auth Объект, позволяющий в дальнейшем взаимодействовать с "открытым окном".
      */
     public function __construct(
-        $username,
-        $password
+        $username = null,
+        $password = null
     ){
         $config = Yaml::parse(file_get_contents('config.yml'));
         $configAuth = $config['auth'];
@@ -54,7 +54,6 @@ class Auth {
 
         $guzzle = new \GuzzleHttp\Client(['base_uri' => $this->baseURL]);
         $this->endpoints = json_decode($guzzle->get(sprintf("/realms/%s/.well-known/openid-configuration", $this->realm))->getBody());
-        $t = microtime(true);
         $loginData = json_decode($guzzle->post($this->endpoints->token_endpoint, [
             'form_params' => [
                 'grant_type' => 'password',
@@ -64,10 +63,51 @@ class Auth {
                 'password' => $password
             ]
         ])->getBody());
+        $this->setTokens($loginData);
+    }
+    /**
+     * Сохраняет информацию о токенах в соответствующих полях класса.
+     * @param object $loginData Данные о токене доступа, полученные из OAuth.
+     * @return void
+     */
+    protected function setTokens($loginData){
+        $t = microtime(true);
         $this->token = $loginData->access_token;
         $this->refreshToken = $loginData->refresh_token;
         $this->tokenExpiry = $t+$loginData->expires_in*1000;
         $this->refreshTokenExpiry = $t+$loginData->refresh_expires_in*1000;
-        session_start();
     }
+    /**
+     * Выполняет проверку истечения токена и его освежение.
+     * @return void
+     */
+    public function doTokenRefresh(){
+        $ct = microtime(true);
+        if($ct > $this->tokenExpiry){
+            if($ct < $this->refreshTokenExpiry){
+                $guzzle = new \GuzzleHttp\Client(['base_uri' => $this->baseURL]);
+                $configAuth = (Yaml::parse(file_get_contents('config.yml')))['auth'];
+                $loginData = json_decode($guzzle->post($this->endpoints->token_endpoint, [
+                    'form_params' => [
+                        'grant_type' => 'refresh_token',
+                        'client_id' => $configAuth['client_id'],
+                        'client_secret' => $configAuth['client_secret'],
+                        'refresh_token' => $this->refreshToken
+                    ]
+                ])->getBody());
+                $this->setTokens($loginData);
+            } else {
+                throw new AuthRefreshTokenExpiredException("Refresh token expired.");
+            }
+        }
+    }
+}
+
+/**
+ * Исключение, говорящее нам, что refresh-токен истек, т.е. активности пользователя не было на протяжении долгого времени.
+ * Должно быть поймано с перенаправлением на страницу входа,
+ * или вход с тем же именем/паролем, что и раньше, должен быть осуществлен иным образом.
+ */
+class AuthRefreshTokenExpiredException extends \Exception {
+
 }
