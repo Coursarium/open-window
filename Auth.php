@@ -68,5 +68,6 @@ class Auth {
         $this->refreshToken = $loginData->refresh_token;
         $this->tokenExpiry = $t+$loginData->expires_in*1000;
         $this->refreshTokenExpiry = $t+$loginData->refresh_expires_in*1000;
+        session_start();
     }
 }
