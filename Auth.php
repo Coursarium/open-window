@@ -44,8 +44,8 @@ class Auth {
      * @return Auth Объект, позволяющий в дальнейшем взаимодействовать с "открытым окном".
      */
     public function __construct(
-        $username = null,
-        $password = null
+        $username,
+        $password
     ){
         $config = Yaml::parse(file_get_contents('config.yml'));
         $configAuth = $config['auth'];
