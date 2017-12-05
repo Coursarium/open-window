@@ -101,6 +101,19 @@ class Auth {
             }
         }
     }
+    /**
+     * Возвращает информацию о в настоящее время залогиненом пользователе.
+     * @return object Информация о пользователе, предоставляемая API открытого окна.
+     */
+    public function getUserInfo(){
+        $this->doTokenRefresh();
+        $guzzle = new \GuzzleHttp\Client(['base_uri' => $this->baseURL]);
+        return json_decode($guzzle->get($this->endpoints->userinfo_endpoint, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->token
+            ]
+        ])->getBody());
+    }
 }
 
 /**
