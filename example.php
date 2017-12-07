@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . DIRECTORY_SEPARATOR . 'Auth.php';
+require __DIR__ . DIRECTORY_SEPARATOR;
 use \Coursarium\OpenWindow\Auth as OpenWindowAuth;
-$ow = new OpenWindowAuth("your_username", "your_password");
+$ow = new OpenWindowAuth("universarium ", "3kplctd2");
 var_export($ow->getUserInfo());
