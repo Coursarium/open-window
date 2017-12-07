@@ -1,4 +1,4 @@
-Open edu API library.
+Open edu API library.  
 TODO: 
   - autotests
   - more features
