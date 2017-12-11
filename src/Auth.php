@@ -1,6 +1,6 @@
 <?php
 namespace Coursarium\OpenWindow;
-require __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+require __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use Symfony\Component\Yaml\Yaml;
 
@@ -47,7 +47,7 @@ class Auth {
         $username,
         $password
     ){
-        $config = Yaml::parse(file_get_contents('config.yml'));
+        $config = Yaml::parse(file_get_contents('../config.yml'));
         $configAuth = $config['auth'];
         $this->baseURL = $configAuth['base_url'];
         $this->realm = $configAuth['realm'];
