@@ -3,3 +3,5 @@ auth:
     client_id: your_client_id
     client_secret: your_client_secret
     realm: your_realm
+    phpunit_username: username_for_unit_testing
+    phpunit_password: password_for_unit_testing

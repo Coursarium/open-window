@@ -47,7 +47,7 @@ class Auth {
         $username,
         $password
     ){
-        $config = Yaml::parse(file_get_contents('../config.yml'));
+        $config = Yaml::parse(file_get_contents(implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'config.yml'])));
         $configAuth = $config['auth'];
         $this->baseURL = $configAuth['base_url'];
         $this->realm = $configAuth['realm'];
