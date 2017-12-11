@@ -1,6 +1,6 @@
 <?php
 namespace Coursarium\OpenWindow;
-require __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+require implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'vendor', 'autoload.php']);
 
 use Symfony\Component\Yaml\Yaml;
 
