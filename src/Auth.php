@@ -52,9 +52,9 @@ class Auth {
         $this->baseURL = $configAuth['base_url'];
         $this->realm = $configAuth['realm'];
 
-        $guzzle = new \GuzzleHttp\Client(['base_uri' => $this->baseURL]);
-        $this->endpoints = json_decode($guzzle->get(sprintf("/realms/%s/.well-known/openid-configuration", $this->realm))->getBody());
-        $loginData = json_decode($guzzle->post($this->endpoints->token_endpoint, [
+        $this->guzzle = new \GuzzleHttp\Client(['base_uri' => "$this->baseURL/realms/$this->realm/protocol/openid-connect/"]);
+        //$this->endpoints = json_decode($guzzle->get(sprintf("/realms/%s/.well-known/openid-configuration", $this->realm))->getBody());
+        $loginData = \GuzzleHttp\json_decode($this->guzzle->post('token', [
             'form_params' => [
                 'grant_type' => 'password',
                 'client_id' => $configAuth['client_id'],
@@ -85,9 +85,8 @@ class Auth {
         $ct = microtime(true);
         if($ct > $this->tokenExpiry){
             if($ct < $this->refreshTokenExpiry){
-                $guzzle = new \GuzzleHttp\Client(['base_uri' => $this->baseURL]);
                 $configAuth = (Yaml::parse(file_get_contents('config.yml')))['auth'];
-                $loginData = json_decode($guzzle->post($this->endpoints->token_endpoint, [
+                $loginData = \GuzzleHttp\json_decode($this->guzzle->post('token', [
                     'form_params' => [
                         'grant_type' => 'refresh_token',
                         'client_id' => $configAuth['client_id'],
@@ -107,8 +106,7 @@ class Auth {
      */
     public function getUserInfo(){
         $this->doTokenRefresh();
-        $guzzle = new \GuzzleHttp\Client(['base_uri' => $this->baseURL]);
-        return json_decode($guzzle->get($this->endpoints->userinfo_endpoint, [
+        return \GuzzleHttp\json_decode($this->guzzle->get('userinfo', [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->token
             ]
