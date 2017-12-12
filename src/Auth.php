@@ -39,6 +39,10 @@ class Auth {
      */
     protected $endpoints;
     /**
+     * @var object Содержит в себе HTTP-клиент Guzzle.
+     */
+    protected $guzzle;
+    /**
      * @param string $username Имя пользователя, используемое для входа.
      * @param string $password Пароль.
      * @return Auth Объект, позволяющий в дальнейшем взаимодействовать с "открытым окном".
